@@ -35,10 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
@@ -55,11 +51,21 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="BridgeTests.cs" />
+    <Compile Include="Lights.UnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ChrisBrooksbank.Hue.Implementation\ChrisBrooksbank.Hue.Implementation.csproj">
+      <Project>{a96cb7c0-65ed-479b-8ec4-fe9ad2e4cbbb}</Project>
+      <Name>ChrisBrooksbank.Hue.Implementation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ChrisBrooksbank.HueInterfaces\ChrisBrooksbank.Hue.Interfaces.csproj">
+      <Project>{2c6d37b1-83a2-4793-9114-30f603468eaf}</Project>
+      <Name>ChrisBrooksbank.Hue.Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

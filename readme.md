@@ -1,7 +1,11 @@
 #Hue.Csharp
+V 0.1 Pre Alpha
 
-Under construction.
+This is a dotnet library for controlling a Phillips Hue installation.
 
-This is a dotnet library for controlling Phillips Hue lights.
+Its being developed using SOLID principles and TDD.
 
-Its being developed using TDD.
+The stairway pattern is being used.
+Interfaces are defined in the class library ChrisBrooksbank.Hue.Interfaces
+Implementations in ChrisBrooksbank.Hue.Implementation
+Unit tests in ChrisBrooksbank.Hue.UnitTests

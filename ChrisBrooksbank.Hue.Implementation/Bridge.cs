@@ -1,109 +1,16 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using ChrisBrooksbank.Hue.Interfaces;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System;
-using System.Net;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 
-namespace Hue.Csharp.BridgeTests
+namespace ChrisBrooksbank.Hue.Implementation
 {
-    [TestClass]
-    public class BridgeTests
-    {
-        [TestMethod]
-        public async Task GetBridgeAddress()
-        {
-            IBridgeConnectivity bridge = new Bridge();
 
-            IPAddress bridgeAddress = await bridge.GetBridgeAddress();
-
-            Assert.IsNotNull(bridgeAddress);
-        }
-
-        [TestMethod]
-        public async Task BridgeFoundAtAddress()
-        {
-            IBridgeConnectivity bridge = new Bridge();
-
-            IPAddress bridgeAddress = await bridge.GetBridgeAddress();
-            bool bridgeFound = await bridge.BridgeFoundAtAddress(bridgeAddress);
-
-            Assert.IsTrue(bridgeFound);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ELinkButtonNotPressed))]
-        public async Task CreateNewUserFailsWithoutPressingLinkButton()
-        {
-            IBridgeConnectivity bridge = new Bridge();
-
-            IPAddress bridgeAddress = await bridge.GetBridgeAddress();
-            string newUser = await bridge.CreateNewUser(bridgeAddress);
-        }
-
-        [TestMethod]
-        public async Task GetLandingLight()
-        {
-            Bridge bridge = new Bridge();
-           
-            IPAddress bridgeAddress = await bridge.GetBridgeAddress();
-            string userName = "hS582W-AhSdUEE7Tfjll2xslcgFOTOEglDTOZTpA";
-
-            Light light = await bridge.GetLight(bridgeAddress, userName, "landing");
-
-            Assert.IsTrue(light != null);
-        }
-
-        [TestMethod]
-        public async Task AtLeastOneLight()
-        {
-            Bridge bridge = new Bridge();
-
-            IPAddress bridgeAddress = await bridge.GetBridgeAddress();
-            string userName = "hS582W-AhSdUEE7Tfjll2xslcgFOTOEglDTOZTpA";
-
-            Dictionary<string, Light> lights = await bridge.GetLights(bridgeAddress, userName);
-
-            Assert.IsTrue(lights.Count > 0);
-        }
-
-        [TestMethod]
-        public async Task TurnLandingLightOn()
-        {
-            Bridge bridge = new Bridge();
-
-            IPAddress bridgeAddress = await bridge.GetBridgeAddress();
-            string userName = "hS582W-AhSdUEE7Tfjll2xslcgFOTOEglDTOZTpA";
-
-            bool turnedOn = await bridge.TurnOn(bridgeAddress, userName, "landing");
-            Assert.IsTrue(turnedOn);
-        }
-
-        [TestMethod]
-        public async Task TurnLandingLightOff()
-        {
-            Bridge bridge = new Bridge();
-
-            IPAddress bridgeAddress = await bridge.GetBridgeAddress();
-            string userName = "hS582W-AhSdUEE7Tfjll2xslcgFOTOEglDTOZTpA";
-
-            bool turnedOff = await bridge.TurnOff(bridgeAddress, userName, "landing");
-            Assert.IsTrue(turnedOff);
-        }
-
-
-
-    }
-
-
-    public class ELinkButtonNotPressed : ApplicationException
-    {
-
-    }
-
- 
-    internal class Bridge : IBridgeConnectivity, ILightsReader, ILightsWriter
+    // TODO , this class needs splitting up in a sensible way
+    public class Bridge : IBridgeQuery, IBridgeCommand, ILightQuery, ILightStateCommand, ILightCommand
     {
         class upnpResponse
         {
@@ -138,7 +45,7 @@ namespace Hue.Csharp.BridgeTests
             return ipAddress;
         }
 
-        public async Task<bool> BridgeFoundAtAddress(IPAddress bridgeAddress)
+        public async Task<bool> Ping(IPAddress bridgeAddress)
         {
             bool bridgeChecked = false;
 
@@ -174,7 +81,7 @@ namespace Hue.Csharp.BridgeTests
                 HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Post, RequestUri = RequestUri, Content = requestContent };
                 HttpResponseMessage response = await client.SendAsync(request);
 
-                if ( response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
                     // responseString = "[{\"success\":{\"username\":\"mEifRt9dRMIlKu4c1qNrl6GZ1ky92NAtwUyTdxpU\"}}]";
@@ -192,14 +99,14 @@ namespace Hue.Csharp.BridgeTests
         }
 
 
-        public async Task<Light>  GetLight(IPAddress bridgeAddress, string userName, string lightName)
+        public async Task<Light> GetLight(IPAddress bridgeAddress, string userName, string lightName)
         {
             Light light = new Light();
             Dictionary<string, Light> lights = await this.GetLights(bridgeAddress, userName);
 
             foreach (Light candidateLight in lights.Values)
             {
-                if ( candidateLight.name.Equals(lightName, StringComparison.CurrentCultureIgnoreCase))
+                if (candidateLight.name.Equals(lightName, StringComparison.CurrentCultureIgnoreCase))
                 {
                     light = candidateLight;
                     break;
@@ -223,10 +130,10 @@ namespace Hue.Csharp.BridgeTests
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
 
-                    lights = JsonConvert.DeserializeObject<Dictionary<string,Light>>(responseString);
+                    lights = JsonConvert.DeserializeObject<Dictionary<string, Light>>(responseString);
 
                     // assign id property to each light
-                    foreach(var keyvalue in lights)
+                    foreach (var keyvalue in lights)
                     {
                         ((Light)(keyvalue.Value)).id = keyvalue.Key;
                     }
@@ -238,15 +145,15 @@ namespace Hue.Csharp.BridgeTests
             return lights;
         }
 
-       public async Task<bool> TurnOn(IPAddress bridgeAddress, string userName, string lightName)
+        public async Task<bool> TurnOn(IPAddress bridgeAddress, string userName, string lightName)
         {
             bool isOn = false;
 
-            Light light = await this.GetLight( bridgeAddress, userName, lightName);
+            Light light = await this.GetLight(bridgeAddress, userName, lightName);
 
-            if ( light != null )
+            if (light != null)
             {
-                if ( light.state.on )
+                if (light.state.on)
                 {
                     return true;
                 }
@@ -315,52 +222,54 @@ namespace Hue.Csharp.BridgeTests
             return isOff;
         }
 
-    }
+        public Task<bool> SetState(IPAddress bridgeAddress, string userName, string lightName, LightStateChangeCommand stateChangeCommand)
+        {
+            throw new NotImplementedException();
+        }
 
+        public Task<bool> DeleteLight(IPAddress bridgeAddress, string userName, string lightName)
+        {
+            throw new NotImplementedException();
+        }
 
-    public class LightState
-    {
-        public bool on { get; set; }
-        public byte bri { get; set; }
-        public int hue { get; set; }
-        public byte sat { get; set; }
-        public string effect { get; set; }
-        public float[] xy { get; set; }
-        public int ct { get; set; }
-        public string alert { get; set; }
-        public string colormode { get; set; }
-        public bool reachable { get; set; }
-    }
+        public async Task<bool> TurnAllOn(IPAddress bridgeAddress, string userName)
+        {
+            using (var client = new HttpClient())
+            {
+                Uri RequestUri = new Uri("http://" + bridgeAddress + "/api/" + userName + "/groups/0/action");
 
+                StringContent requestContent = new StringContent("{\"on\" : true}");
 
-    public class Light {
-        public string id { get; set; }
-        public LightState state { get; set; }
-        public string type { get; set; }
-        public string name { get; set; }
-        public string modelid { get; set; }
-        public string manufacturername { get; set; }
-        public string uniqueid { get; set; }
-        public string swversion { get; set; }
-    }
+                HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
+                HttpResponseMessage response = await client.SendAsync(request);
+            }
 
-    internal interface ILightsReader
-    {
-        Task<Light> GetLight(IPAddress bridgeAddress, string userName, string lightName);
-        Task<Dictionary<string, Light>> GetLights(IPAddress bridgeAddress, string userName);
-    }
+            return true;
+        }
 
-    internal interface ILightsWriter
-    {
-        Task<bool> TurnOn(IPAddress bridgeAddress, string userName, string lightName);
-        Task<bool> TurnOff(IPAddress bridgeAddress, string userName, string lightName);
-    }
+        public async Task<bool> TurnAllOff(IPAddress bridgeAddress, string userName)
+        {
+            using (var client = new HttpClient())
+            {
+                Uri RequestUri = new Uri("http://" + bridgeAddress + "/api/" + userName + "/groups/0/action");
 
+                StringContent requestContent = new StringContent("{\"on\" : false}");
 
-    internal interface IBridgeConnectivity
-    {
-        Task<IPAddress> GetBridgeAddress();
-        Task<bool> BridgeFoundAtAddress(IPAddress bridgeAddress);
-        Task<string> CreateNewUser(IPAddress bridgeAddress);
+                HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
+                HttpResponseMessage response = await client.SendAsync(request);
+            }
+
+            return true;
+        }
+
+        public Task<bool> RenameLight(IPAddress bridgeAddress, string userName, string oldLightName, string newLightName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Light> FindNewLights(IPAddress bridgeAddress, string userName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
