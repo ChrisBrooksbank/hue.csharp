@@ -44,6 +44,7 @@
     <Compile Include="IBridgeQuery.cs" />
     <Compile Include="IConfigurationCommand.cs" />
     <Compile Include="IConfigurationQuery.cs" />
+    <Compile Include="IHueDotNetConfigurationReader.cs" />
     <Compile Include="IGroupCommand.cs" />
     <Compile Include="IGroupQuery.cs" />
     <Compile Include="ILightCommand.cs" />

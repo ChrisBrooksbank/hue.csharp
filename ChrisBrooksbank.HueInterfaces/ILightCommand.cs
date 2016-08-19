@@ -6,8 +6,8 @@ namespace ChrisBrooksbank.Hue.Interfaces
 {
     public interface ILightCommand
     {
-        Task<bool> RenameLight(IPAddress bridgeAddress, string userName, string oldLightName, string newLightName);
-        Task<bool> DeleteLight(IPAddress bridgeAddress, string userName, string lightName);
-        List<Light> FindNewLights(IPAddress bridgeAddress, string userName);
+        Task<bool> RenameLight(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string oldLightName, string newLightName);
+        Task<bool> DeleteLight(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName);
+        List<Light> FindNewLights(IHueDotNetConfigurationReader hueDotNetconfigurationReader);
     }
 }

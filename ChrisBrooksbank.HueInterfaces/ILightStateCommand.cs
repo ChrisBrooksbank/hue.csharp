@@ -17,10 +17,10 @@ namespace ChrisBrooksbank.Hue.Interfaces
 
     public interface ILightStateCommand
     {
-        Task<bool> TurnAllOn(IPAddress bridgeAddress, string userName);
-        Task<bool> TurnAllOff(IPAddress bridgeAddress, string userName);
-        Task<bool> TurnOn(IPAddress bridgeAddress, string userName, string lightName);
-        Task<bool> TurnOff(IPAddress bridgeAddress, string userName, string lightName);
-        Task<bool> SetState(IPAddress bridgeAddress, string userName, string lightName, LightStateChangeCommand stateChangeCommand);
+        Task<bool> TurnAllOn(IHueDotNetConfigurationReader hueDotNetconfigurationReader);
+        Task<bool> TurnAllOff(IHueDotNetConfigurationReader hueDotNetconfigurationReader);
+        Task<bool> TurnOn(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName);
+        Task<bool> TurnOff(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName);
+        Task<bool> SetState(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName, LightStateChangeCommand stateChangeCommand);
     }
 }

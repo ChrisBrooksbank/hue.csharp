@@ -10,8 +10,55 @@ namespace ChrisBrooksbank.Hue.Implementation
 {
 
     // TODO , this class needs splitting up in a sensible way
-    public class Bridge : IBridgeQuery, IBridgeCommand, ILightQuery, ILightStateCommand, ILightCommand
+    public class Bridge : IBridgeQuery, IBridgeCommand, ILightQuery, ILightStateCommand, ILightCommand, IHueDotNetConfigurationReader
     {
+
+        private class HueDontNetConfiguration
+        {
+            public string BridgeAddress { get; set; }
+            public string UserName { get; set; }
+        }
+
+
+        public IPAddress BridgeAddress
+        {
+            get
+            {
+                var filestream = new System.IO.FileStream("HueDotNetConfiguration.json",
+                                          System.IO.FileMode.Open,
+                                          System.IO.FileAccess.Read,
+                                          System.IO.FileShare.ReadWrite);
+
+                var file = new System.IO.StreamReader(filestream, System.Text.Encoding.UTF8, true, 128);
+
+                string json = file.ReadToEnd();
+
+                HueDontNetConfiguration config = JsonConvert.DeserializeObject<HueDontNetConfiguration>(json);
+
+                return IPAddress.Parse(config.BridgeAddress);
+            }
+        }
+
+        public string UserName
+        {
+            get
+            {
+                var filestream = new System.IO.FileStream("HueDotNetConfiguration.json",
+                                          System.IO.FileMode.Open,
+                                          System.IO.FileAccess.Read,
+                                          System.IO.FileShare.ReadWrite);
+
+                var file = new System.IO.StreamReader(filestream, System.Text.Encoding.UTF8, true, 128);
+
+                string json = file.ReadToEnd();
+
+
+                HueDontNetConfiguration config = JsonConvert.DeserializeObject<HueDontNetConfiguration>(json);
+
+                return config.UserName;
+            }
+        }
+
         class upnpResponse
         {
             public string id { get; set; }
@@ -99,10 +146,10 @@ namespace ChrisBrooksbank.Hue.Implementation
         }
 
 
-        public async Task<Light> GetLight(IPAddress bridgeAddress, string userName, string lightName)
+        public async Task<Light> GetLight(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
         {
             Light light = new Light();
-            Dictionary<string, Light> lights = await this.GetLights(bridgeAddress, userName);
+            Dictionary<string, Light> lights = await this.GetLights(hueDotNetconfigurationReader);
 
             foreach (Light candidateLight in lights.Values)
             {
@@ -116,15 +163,15 @@ namespace ChrisBrooksbank.Hue.Implementation
             return light;
         }
 
-        public async Task<Dictionary<string, Light>> GetLights(IPAddress bridgeAddress, string userName)
+        public async Task<Dictionary<string, Light>> GetLights(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
         {
             Dictionary<string, Light> lights = new Dictionary<string, Light>();
 
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new System.Uri("http://" + bridgeAddress);
+                client.BaseAddress = new System.Uri("http://" + hueDotNetconfigurationReader.BridgeAddress);
 
-                HttpResponseMessage response = await client.GetAsync("/api/" + userName + "/lights");
+                HttpResponseMessage response = await client.GetAsync("/api/" + hueDotNetconfigurationReader.UserName + "/lights");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -145,11 +192,11 @@ namespace ChrisBrooksbank.Hue.Implementation
             return lights;
         }
 
-        public async Task<bool> TurnOn(IPAddress bridgeAddress, string userName, string lightName)
+        public async Task<bool> TurnOn(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
         {
             bool isOn = false;
 
-            Light light = await this.GetLight(bridgeAddress, userName, lightName);
+            Light light = await this.GetLight(hueDotNetconfigurationReader, lightName);
 
             if (light != null)
             {
@@ -163,7 +210,7 @@ namespace ChrisBrooksbank.Hue.Implementation
 
                 using (var client = new HttpClient())
                 {
-                    Uri RequestUri = new Uri("http://" + bridgeAddress + "/api/" + userName + "/lights/" + light.id + "/state");
+                    Uri RequestUri = new Uri("http://" + hueDotNetconfigurationReader.BridgeAddress + "/api/" + hueDotNetconfigurationReader.UserName + "/lights/" + light.id + "/state");
 
                     StringContent requestContent = new StringContent("{\"on\" : true}");
 
@@ -172,7 +219,7 @@ namespace ChrisBrooksbank.Hue.Implementation
 
                     if (response.IsSuccessStatusCode)
                     {
-                        light = await this.GetLight(bridgeAddress, userName, lightName);
+                        light = await this.GetLight(hueDotNetconfigurationReader, lightName);
                         if (light != null)
                         {
                             isOn = light.state.on;
@@ -186,11 +233,11 @@ namespace ChrisBrooksbank.Hue.Implementation
             return isOn;
         }
 
-        public async Task<bool> TurnOff(IPAddress bridgeAddress, string userName, string lightName)
+        public async Task<bool> TurnOff(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
         {
             bool isOff = false;
 
-            Light light = await this.GetLight(bridgeAddress, userName, lightName);
+            Light light = await this.GetLight(hueDotNetconfigurationReader, lightName);
 
             if (light != null)
             {
@@ -201,7 +248,7 @@ namespace ChrisBrooksbank.Hue.Implementation
 
                 using (var client = new HttpClient())
                 {
-                    Uri RequestUri = new Uri("http://" + bridgeAddress + "/api/" + userName + "/lights/" + light.id + "/state");
+                    Uri RequestUri = new Uri("http://" + hueDotNetconfigurationReader.BridgeAddress + "/api/" + hueDotNetconfigurationReader.UserName + "/lights/" + light.id + "/state");
 
                     StringContent requestContent = new StringContent("{\"on\" : false}");
 
@@ -210,7 +257,7 @@ namespace ChrisBrooksbank.Hue.Implementation
 
                     if (response.IsSuccessStatusCode)
                     {
-                        light = await this.GetLight(bridgeAddress, userName, lightName);
+                        light = await this.GetLight(hueDotNetconfigurationReader,  lightName);
                         if (light != null)
                         {
                             isOff = !light.state.on;
@@ -222,21 +269,21 @@ namespace ChrisBrooksbank.Hue.Implementation
             return isOff;
         }
 
-        public Task<bool> SetState(IPAddress bridgeAddress, string userName, string lightName, LightStateChangeCommand stateChangeCommand)
+        public Task<bool> SetState(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName, LightStateChangeCommand stateChangeCommand)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> DeleteLight(IPAddress bridgeAddress, string userName, string lightName)
+        public Task<bool> DeleteLight(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<bool> TurnAllOn(IPAddress bridgeAddress, string userName)
+        public async Task<bool> TurnAllOn(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
         {
             using (var client = new HttpClient())
             {
-                Uri RequestUri = new Uri("http://" + bridgeAddress + "/api/" + userName + "/groups/0/action");
+                Uri RequestUri = new Uri("http://" + hueDotNetconfigurationReader.BridgeAddress + "/api/" + hueDotNetconfigurationReader.UserName + "/groups/0/action");
 
                 StringContent requestContent = new StringContent("{\"on\" : true}");
 
@@ -247,11 +294,11 @@ namespace ChrisBrooksbank.Hue.Implementation
             return true;
         }
 
-        public async Task<bool> TurnAllOff(IPAddress bridgeAddress, string userName)
+        public async Task<bool> TurnAllOff(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
         {
             using (var client = new HttpClient())
             {
-                Uri RequestUri = new Uri("http://" + bridgeAddress + "/api/" + userName + "/groups/0/action");
+                Uri RequestUri = new Uri("http://" + hueDotNetconfigurationReader.BridgeAddress + "/api/" + hueDotNetconfigurationReader.UserName + "/groups/0/action");
 
                 StringContent requestContent = new StringContent("{\"on\" : false}");
 
@@ -262,12 +309,12 @@ namespace ChrisBrooksbank.Hue.Implementation
             return true;
         }
 
-        public Task<bool> RenameLight(IPAddress bridgeAddress, string userName, string oldLightName, string newLightName)
+        public Task<bool> RenameLight(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string oldLightName, string newLightName)
         {
             throw new NotImplementedException();
         }
 
-        public List<Light> FindNewLights(IPAddress bridgeAddress, string userName)
+        public List<Light> FindNewLights(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
         {
             throw new NotImplementedException();
         }
