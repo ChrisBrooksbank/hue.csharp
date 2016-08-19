@@ -6,5 +6,7 @@ namespace ChrisBrooksbank.Hue.Interfaces
     {
         IPAddress BridgeAddress { get; }
         string UserName { get; }
+        string ApplicationName { get; }
     }
+
 }

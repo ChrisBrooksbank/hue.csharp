@@ -10,7 +10,7 @@ namespace ChrisBrooksbank.Hue.Interfaces
 
     public interface IBridgeCommand
     {
-        Task<bool> Ping(IPAddress bridgeAddress);
-        Task<string> CreateNewUser(IPAddress bridgeAddress);
+        Task<bool> Ping();
+        Task<string> CreateNewUser();
     }
 }

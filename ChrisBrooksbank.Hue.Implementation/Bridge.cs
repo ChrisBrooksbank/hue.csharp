@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 namespace ChrisBrooksbank.Hue.Implementation
 {
 
-    // TODO , this class needs splitting up in a sensible way
-    public class Bridge : IBridgeQuery, IBridgeCommand, ILightQuery, ILightStateCommand, ILightCommand, IHueDotNetConfigurationReader
+    // TODO , the code in this class needs moving to new implenentation classes, then delete this class
+    public class Bridge
     {
 
         private class HueDontNetConfiguration
@@ -267,16 +267,6 @@ namespace ChrisBrooksbank.Hue.Implementation
             }
 
             return isOff;
-        }
-
-        public Task<bool> SetState(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName, LightStateChangeCommand stateChangeCommand)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> DeleteLight(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<bool> TurnAllOn(IHueDotNetConfigurationReader hueDotNetconfigurationReader)

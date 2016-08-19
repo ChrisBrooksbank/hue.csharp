@@ -33,8 +33,8 @@ namespace ChrisBrooksbank.Hue.Interfaces
 
     public interface ILightQuery
     {
-        Task<Light> GetLight(IHueDotNetConfigurationReader hueDotNetconfigurationReader,  string lightName);
-        Task<Dictionary<string, Light>> GetLights(IHueDotNetConfigurationReader hueDotNetconfigurationReader);
+        Task<Light> GetLight(string lightName);
+        Task<Dictionary<string, Light>> GetLights();
     }
 
 }

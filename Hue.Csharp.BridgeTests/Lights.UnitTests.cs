@@ -11,23 +11,24 @@ namespace ChrisBrooksbank.Hue.BridgeTests
 
         private readonly string testLightName = "landing";
 
+        IHueDotNetConfigurationReader hueDotNetconfigurationReader;
+
         IBridgeQuery bridgeQuery;
         IBridgeCommand bridgeCommand;
+
         ILightQuery lightQuery;
-        ILightCommand lightCommand;
-        ILightStateCommand lightStateCommand;
-        IHueDotNetConfigurationReader hueDotNetconfigurationReader;
+
+        ILightSwitch lightSwitch;
 
         public BridgeTests()
         {
-            ChrisBrooksbank.Hue.Implementation.Bridge bridge = new ChrisBrooksbank.Hue.Implementation.Bridge();
+            hueDotNetconfigurationReader = new Implementation.HueDotNetConfigurationReader();
 
-            hueDotNetconfigurationReader = bridge;
-            bridgeQuery = bridge;
-            bridgeCommand = bridge;
-            lightQuery = bridge;
-            lightCommand = bridge;
-            lightStateCommand = bridge;
+            bridgeQuery = new Implementation.BridgeQuery();
+            bridgeCommand = new Implementation.BridgeCommand(hueDotNetconfigurationReader);
+
+            lightQuery = new Implementation.LightQuery(hueDotNetconfigurationReader);
+            lightSwitch = new Implementation.LightSwitch(hueDotNetconfigurationReader, lightQuery);
         }
 
         private async Task<IPAddress> GetTestsBridgeAddress()
@@ -55,7 +56,7 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         [TestMethod]
         public async Task BridgeFoundAtAddress()
         {
-            bool bridgeFound = await bridgeCommand.Ping(hueDotNetconfigurationReader.BridgeAddress);
+            bool bridgeFound = await bridgeCommand.Ping();
 
             Assert.IsTrue(bridgeFound);
         }
@@ -64,13 +65,13 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         [ExpectedException(typeof(ELinkButtonNotPressed))]
         public async Task CreateNewUserFailsWithoutPressingLinkButton()
         {
-            string newUser = await bridgeCommand.CreateNewUser(hueDotNetconfigurationReader.BridgeAddress);
+            string newUser = await bridgeCommand.CreateNewUser();
         }
 
         [TestMethod]
         public async Task GetLight()
         {
-            Light light = await lightQuery.GetLight(hueDotNetconfigurationReader, testLightName);
+            Light light = await lightQuery.GetLight(testLightName);
 
             Assert.IsTrue(light != null);
         }
@@ -78,38 +79,9 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         [TestMethod]
         public async Task AtLeastOneLight()
         {
-            Dictionary<string, Light> lights = await lightQuery.GetLights(hueDotNetconfigurationReader);
+            Dictionary<string, Light> lights = await lightQuery.GetLights();
             Assert.IsTrue(lights.Count > 0);
         }
-
-        [TestMethod]
-        public async Task TurnAllLightsOn()
-        {
-            bool turnedOn = await lightStateCommand.TurnAllOn(hueDotNetconfigurationReader);
-            Assert.IsTrue(turnedOn);
-        }
-
-        [TestMethod]
-        public async Task TurnAllLightsOff()
-        {
-            bool turnedOn = await lightStateCommand.TurnAllOff(hueDotNetconfigurationReader);
-            Assert.IsTrue(turnedOn);
-        }
-
-        [TestMethod]
-        public async Task TurnLightOn()
-        {
-            bool turnedOn = await lightStateCommand.TurnOn(hueDotNetconfigurationReader, testLightName);
-            Assert.IsTrue(turnedOn);
-        }
-
-        [TestMethod]
-        public async Task TurnLightOff()
-        {
-            bool turnedOff = await lightStateCommand.TurnOff(hueDotNetconfigurationReader, testLightName);
-            Assert.IsTrue(turnedOff);
-        }
-
 
     }
    

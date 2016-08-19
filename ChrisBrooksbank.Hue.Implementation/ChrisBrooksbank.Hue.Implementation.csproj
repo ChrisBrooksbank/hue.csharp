@@ -45,6 +45,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bridge.cs" />
+    <Compile Include="BridgeCommand.cs" />
+    <Compile Include="BridgeQuery.cs" />
+    <Compile Include="HueDotNetConfigurationReader.cs" />
+    <Compile Include="LightColourSwitch.cs" />
+    <Compile Include="LightDimmerSwitch.cs" />
+    <Compile Include="LightEffectSwitch.cs" />
+    <Compile Include="LightQuery.cs" />
+    <Compile Include="LightSwitch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

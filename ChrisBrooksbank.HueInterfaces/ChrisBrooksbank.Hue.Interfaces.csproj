@@ -42,25 +42,12 @@
   <ItemGroup>
     <Compile Include="IBridgeCommand.cs" />
     <Compile Include="IBridgeQuery.cs" />
-    <Compile Include="IConfigurationCommand.cs" />
-    <Compile Include="IConfigurationQuery.cs" />
     <Compile Include="IHueDotNetConfigurationReader.cs" />
-    <Compile Include="IGroupCommand.cs" />
-    <Compile Include="IGroupQuery.cs" />
-    <Compile Include="ILightCommand.cs" />
+    <Compile Include="ILightColourSwitch.cs" />
+    <Compile Include="ILightDimmerSwitch.cs" />
+    <Compile Include="ILightEffectSwitch.cs" />
     <Compile Include="ILightQuery.cs" />
-    <Compile Include="ILightStateCommand.cs" />
-    <Compile Include="IResourceLinkCommand.cs" />
-    <Compile Include="IResourceLinkQuery.cs" />
-    <Compile Include="IRuleCommand.cs" />
-    <Compile Include="IRuleQuery.cs" />
-    <Compile Include="ISceneCommand.cs" />
-    <Compile Include="ISceneQuery.cs" />
-    <Compile Include="IScheduleCommand.cs" />
-    <Compile Include="IScheduleQuery.cs" />
-    <Compile Include="ISensorCommand.cs" />
-    <Compile Include="ISensorQuery.cs" />
-    <Compile Include="ITimeZoneQuery.cs" />
+    <Compile Include="ILightSwitch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
