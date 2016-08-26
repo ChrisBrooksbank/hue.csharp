@@ -43,10 +43,12 @@
     <Compile Include="IBridgeCommand.cs" />
     <Compile Include="IBridgeQuery.cs" />
     <Compile Include="IHueDotNetConfigurationReader.cs" />
+    <Compile Include="ILight.cs" />
     <Compile Include="ILightColourSwitch.cs" />
     <Compile Include="ILightDimmerSwitch.cs" />
     <Compile Include="ILightEffectSwitch.cs" />
     <Compile Include="ILightQuery.cs" />
+    <Compile Include="ILightState.cs" />
     <Compile Include="ILightSwitch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

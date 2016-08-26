@@ -13,7 +13,7 @@ namespace ChrisBrooksbank.Hue.Implementation
     public class Bridge
     {
 
-        private class HueDontNetConfiguration
+        private class HueDotNetConfiguration
         {
             public string BridgeAddress { get; set; }
             public string UserName { get; set; }
@@ -33,7 +33,7 @@ namespace ChrisBrooksbank.Hue.Implementation
 
                 string json = file.ReadToEnd();
 
-                HueDontNetConfiguration config = JsonConvert.DeserializeObject<HueDontNetConfiguration>(json);
+                HueDotNetConfiguration config = JsonConvert.DeserializeObject<HueDotNetConfiguration>(json);
 
                 return IPAddress.Parse(config.BridgeAddress);
             }
@@ -53,7 +53,7 @@ namespace ChrisBrooksbank.Hue.Implementation
                 string json = file.ReadToEnd();
 
 
-                HueDontNetConfiguration config = JsonConvert.DeserializeObject<HueDontNetConfiguration>(json);
+                HueDotNetConfiguration config = JsonConvert.DeserializeObject<HueDotNetConfiguration>(json);
 
                 return config.UserName;
             }
@@ -66,7 +66,7 @@ namespace ChrisBrooksbank.Hue.Implementation
         }
 
 
-        public async Task<IPAddress> GetBridgeAddress()
+        public async Task<IPAddress> GetBridgeAddressAsync()
         {
             IPAddress ipAddress = null;
 
@@ -92,7 +92,7 @@ namespace ChrisBrooksbank.Hue.Implementation
             return ipAddress;
         }
 
-        public async Task<bool> Ping(IPAddress bridgeAddress)
+        public async Task<bool> PingAsync(IPAddress bridgeAddress)
         {
             bool bridgeChecked = false;
 
@@ -116,7 +116,7 @@ namespace ChrisBrooksbank.Hue.Implementation
             return bridgeChecked;
         }
 
-        public async Task<string> CreateNewUser(IPAddress bridgeAddress)
+        public async Task<string> CreateNewUserAsync(IPAddress bridgeAddress)
         {
             // http://www.developers.meethue.com/documentation/getting-started
             string newUser = string.Empty;
@@ -146,14 +146,14 @@ namespace ChrisBrooksbank.Hue.Implementation
         }
 
 
-        public async Task<Light> GetLight(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
+        public async Task<Light> GetLightAsync(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
         {
             Light light = new Light();
-            Dictionary<string, Light> lights = await this.GetLights(hueDotNetconfigurationReader);
+            Dictionary<string, Light> lights = await this.GetLightsAsync(hueDotNetconfigurationReader);
 
             foreach (Light candidateLight in lights.Values)
             {
-                if (candidateLight.name.Equals(lightName, StringComparison.CurrentCultureIgnoreCase))
+                if (candidateLight.Name.Equals(lightName, StringComparison.CurrentCultureIgnoreCase))
                 {
                     light = candidateLight;
                     break;
@@ -163,7 +163,7 @@ namespace ChrisBrooksbank.Hue.Implementation
             return light;
         }
 
-        public async Task<Dictionary<string, Light>> GetLights(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
+        public async Task<Dictionary<string, Light>> GetLightsAsync(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
         {
             Dictionary<string, Light> lights = new Dictionary<string, Light>();
 
@@ -182,7 +182,7 @@ namespace ChrisBrooksbank.Hue.Implementation
                     // assign id property to each light
                     foreach (var keyvalue in lights)
                     {
-                        ((Light)(keyvalue.Value)).id = keyvalue.Key;
+                        ((Light)(keyvalue.Value)).ID = keyvalue.Key;
                     }
                 }
 
@@ -192,25 +192,25 @@ namespace ChrisBrooksbank.Hue.Implementation
             return lights;
         }
 
-        public async Task<bool> TurnOn(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
+        public async Task<bool> TurnOnAsync(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
         {
             bool isOn = false;
 
-            Light light = await this.GetLight(hueDotNetconfigurationReader, lightName);
+            Light light = await this.GetLightAsync(hueDotNetconfigurationReader, lightName);
 
             if (light != null)
             {
-                if (light.state.on)
+                if (light.State.On)
                 {
                     return true;
                 }
 
-                light.state.on = true;
+                light.State.On = true;
 
 
                 using (var client = new HttpClient())
                 {
-                    Uri RequestUri = new Uri("http://" + hueDotNetconfigurationReader.BridgeAddress + "/api/" + hueDotNetconfigurationReader.UserName + "/lights/" + light.id + "/state");
+                    Uri RequestUri = new Uri("http://" + hueDotNetconfigurationReader.BridgeAddress + "/api/" + hueDotNetconfigurationReader.UserName + "/lights/" + light.ID + "/state");
 
                     StringContent requestContent = new StringContent("{\"on\" : true}");
 
@@ -219,10 +219,10 @@ namespace ChrisBrooksbank.Hue.Implementation
 
                     if (response.IsSuccessStatusCode)
                     {
-                        light = await this.GetLight(hueDotNetconfigurationReader, lightName);
+                        light = await this.GetLightAsync(hueDotNetconfigurationReader, lightName);
                         if (light != null)
                         {
-                            isOn = light.state.on;
+                            isOn = light.State.On;
                         }
                     }
                 }
@@ -233,22 +233,22 @@ namespace ChrisBrooksbank.Hue.Implementation
             return isOn;
         }
 
-        public async Task<bool> TurnOff(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
+        public async Task<bool> TurnOffAsync(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string lightName)
         {
             bool isOff = false;
 
-            Light light = await this.GetLight(hueDotNetconfigurationReader, lightName);
+            Light light = await this.GetLightAsync(hueDotNetconfigurationReader, lightName);
 
             if (light != null)
             {
-                if (!light.state.on)
+                if (!light.State.On)
                 {
                     return true;
                 }
 
                 using (var client = new HttpClient())
                 {
-                    Uri RequestUri = new Uri("http://" + hueDotNetconfigurationReader.BridgeAddress + "/api/" + hueDotNetconfigurationReader.UserName + "/lights/" + light.id + "/state");
+                    Uri RequestUri = new Uri("http://" + hueDotNetconfigurationReader.BridgeAddress + "/api/" + hueDotNetconfigurationReader.UserName + "/lights/" + light.ID + "/state");
 
                     StringContent requestContent = new StringContent("{\"on\" : false}");
 
@@ -257,10 +257,10 @@ namespace ChrisBrooksbank.Hue.Implementation
 
                     if (response.IsSuccessStatusCode)
                     {
-                        light = await this.GetLight(hueDotNetconfigurationReader,  lightName);
+                        light = await this.GetLightAsync(hueDotNetconfigurationReader,  lightName);
                         if (light != null)
                         {
-                            isOff = !light.state.on;
+                            isOff = !light.State.On;
                         }
                     }
                 }
@@ -269,7 +269,7 @@ namespace ChrisBrooksbank.Hue.Implementation
             return isOff;
         }
 
-        public async Task<bool> TurnAllOn(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
+        public async Task<bool> TurnAllOnAsync(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
         {
             using (var client = new HttpClient())
             {
@@ -284,7 +284,7 @@ namespace ChrisBrooksbank.Hue.Implementation
             return true;
         }
 
-        public async Task<bool> TurnAllOff(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
+        public async Task<bool> TurnAllOffAsync(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
         {
             using (var client = new HttpClient())
             {
@@ -299,12 +299,12 @@ namespace ChrisBrooksbank.Hue.Implementation
             return true;
         }
 
-        public Task<bool> RenameLight(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string oldLightName, string newLightName)
+        public Task<bool> RenameLightAsync(IHueDotNetConfigurationReader hueDotNetconfigurationReader, string oldLightName, string newLightName)
         {
             throw new NotImplementedException();
         }
 
-        public List<Light> FindNewLights(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
+        public List<Light> FindNewLightsAsync(IHueDotNetConfigurationReader hueDotNetconfigurationReader)
         {
             throw new NotImplementedException();
         }

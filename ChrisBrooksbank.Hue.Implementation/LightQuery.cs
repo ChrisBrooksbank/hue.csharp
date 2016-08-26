@@ -19,14 +19,14 @@ namespace ChrisBrooksbank.Hue.Implementation
             HueConfiguration = hueConfiguration;
         }
 
-        public async Task<Light> GetLight(string lightName)
+        public async Task<ILight> GetLightAsync(string lightName)
         {
             Light light = new Light();
-            Dictionary<string, Light> lights = await this.GetLights();
+            Dictionary<string, ILight> lights = await this.GetLightsAsync();
 
             foreach (Light candidateLight in lights.Values)
             {
-                if (candidateLight.name.Equals(lightName, StringComparison.CurrentCultureIgnoreCase))
+                if (candidateLight.Name.Equals(lightName, StringComparison.CurrentCultureIgnoreCase))
                 {
                     light = candidateLight;
                     break;
@@ -36,9 +36,9 @@ namespace ChrisBrooksbank.Hue.Implementation
             return light;
         }
 
-        public async Task<Dictionary<string, Light>> GetLights()
+        public async Task<Dictionary<string, ILight>> GetLightsAsync()
         {
-            Dictionary<string, Light> lights = new Dictionary<string, Light>();
+            Dictionary<string, ILight> lights = new Dictionary<string, ILight>();
 
             using (var client = new HttpClient())
             {
@@ -50,12 +50,18 @@ namespace ChrisBrooksbank.Hue.Implementation
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
 
-                    lights = JsonConvert.DeserializeObject<Dictionary<string, Light>>(responseString);
+
+                    Dictionary<string, Light> jsonLights = new Dictionary<string, Light>();
+                    jsonLights = JsonConvert.DeserializeObject<Dictionary<string, Light>>(responseString);
+                    foreach(var light in jsonLights)
+                    {
+                        lights.Add(light.Key, light.Value);
+                    }
 
                     // assign id property to each light
                     foreach (var keyvalue in lights)
                     {
-                        ((Light)(keyvalue.Value)).id = keyvalue.Key;
+                        ((ILight)(keyvalue.Value)).ID = keyvalue.Key;
                     }
                 }
 

@@ -71,7 +71,7 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         [TestMethod]
         public async Task GetLight()
         {
-            Light light = await lightQuery.GetLight(testLightName);
+            ILight light = await lightQuery.GetLightAsync(testLightName);
 
             Assert.IsTrue(light != null);
         }
@@ -79,7 +79,7 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         [TestMethod]
         public async Task AtLeastOneLight()
         {
-            Dictionary<string, Light> lights = await lightQuery.GetLights();
+            Dictionary<string, ILight> lights = await lightQuery.GetLightsAsync();
             Assert.IsTrue(lights.Count > 0);
         }
 
