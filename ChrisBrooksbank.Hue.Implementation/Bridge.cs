@@ -207,7 +207,6 @@ namespace ChrisBrooksbank.Hue.Implementation
 
                 light.State.On = true;
 
-
                 using (var client = new HttpClient())
                 {
                     Uri RequestUri = new Uri("http://" + hueDotNetconfigurationReader.BridgeAddress + "/api/" + hueDotNetconfigurationReader.UserName + "/lights/" + light.ID + "/state");

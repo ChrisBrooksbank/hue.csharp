@@ -1,5 +1,7 @@
 ﻿using ChrisBrooksbank.Hue.Interfaces;
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace ChrisBrooksbank.Hue.Implementation
 {
@@ -14,34 +16,98 @@ namespace ChrisBrooksbank.Hue.Implementation
             LightQuery = lightQuery;
         }
 
-        public void TurnOffAll()
+        public async Task TurnOffAllAsync()
+        {
+            Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/groups/0/action");
+            StringContent requestContent = new StringContent("{\"on\" : false}");
+
+            HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
+            using (var client = new HttpClient())
+            {
+
+                HttpResponseMessage response = await client.SendAsync(request);
+            }
+
+            return;
+        }
+
+        public async Task TurnOffGroupAsync(string groupName)
         {
             throw new NotImplementedException();
         }
 
-        public void TurnOffGroup(string groupName)
+        public async Task TurnOffLightAsync(string lightName)
+        {
+            ILight light = await LightQuery.GetLightAsync(lightName);
+
+            if (light != null)
+            {
+                if (!light.State.On)
+                {
+                    return;
+                }
+
+                light.State.On = false;
+
+                Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/lights/" + light.ID + "/state");
+                StringContent requestContent = new StringContent("{\"on\" : false}");
+                HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
+
+                using (var client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.SendAsync(request);
+                }
+
+            }
+
+            return;
+        }
+
+        public async Task TurnOnAllAsync()
+        {
+            Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/groups/0/action");
+            StringContent requestContent = new StringContent("{\"on\" : true}");
+
+            HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
+            using (var client = new HttpClient())
+            {
+            
+                HttpResponseMessage response = await client.SendAsync(request);
+            }
+
+            return;
+        }
+
+        public async Task TurnOnGroupAsync(string groupName)
         {
             throw new NotImplementedException();
         }
 
-        public void TurnOffLIght(string lightName)
+        public async Task TurnOnLightAsync(string lightName)
         {
-            throw new NotImplementedException();
-        }
+            ILight light = await LightQuery.GetLightAsync(lightName);
 
-        public void TurnOnAll()
-        {
-            throw new NotImplementedException();
-        }
+            if (light != null)
+            {
+                if (light.State.On)
+                {
+                    return;
+                }
 
-        public void TurnOnGroup(string groupName)
-        {
-            throw new NotImplementedException();
-        }
+                light.State.On = true;
 
-        public async void TurnOnLight(string lightName)
-        {
-            throw new NotImplementedException();
+                Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/lights/" + light.ID + "/state");
+                StringContent requestContent = new StringContent("{\"on\" : true}");
+                HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
+
+                using (var client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.SendAsync(request);
+                }
+
+            }
+
+            return;
         }
 
     }

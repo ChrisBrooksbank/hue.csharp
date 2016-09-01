@@ -47,6 +47,8 @@
     <Compile Include="Bridge.cs" />
     <Compile Include="BridgeCommand.cs" />
     <Compile Include="BridgeQuery.cs" />
+    <Compile Include="Group.cs" />
+    <Compile Include="GroupQuery.cs" />
     <Compile Include="HueDotNetConfigurationReader.cs" />
     <Compile Include="Light.cs" />
     <Compile Include="LightColourSwitch.cs" />

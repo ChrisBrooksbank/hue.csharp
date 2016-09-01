@@ -20,6 +20,8 @@ namespace ChrisBrooksbank.Hue.BridgeTests
 
         ILightSwitch lightSwitch;
 
+        IGroupQuery groupQuery;
+
         public BridgeTests()
         {
             hueDotNetconfigurationReader = new Implementation.HueDotNetConfigurationReader();
@@ -29,6 +31,8 @@ namespace ChrisBrooksbank.Hue.BridgeTests
 
             lightQuery = new Implementation.LightQuery(hueDotNetconfigurationReader);
             lightSwitch = new Implementation.LightSwitch(hueDotNetconfigurationReader, lightQuery);
+
+            groupQuery = new Implementation.GroupQuery(hueDotNetconfigurationReader);
         }
 
         private async Task<IPAddress> GetTestsBridgeAddress()
@@ -81,6 +85,34 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         {
             Dictionary<string, ILight> lights = await lightQuery.GetLightsAsync();
             Assert.IsTrue(lights.Count > 0);
+        }
+
+
+        [TestMethod]
+        public async Task CanTurnLightOn()
+        {
+            await lightSwitch.TurnOnLightAsync("landing");
+        }
+
+
+        [TestMethod]
+        public async Task CanTurnLightOff()
+        {
+            await lightSwitch.TurnOffLightAsync("landing");
+        }
+
+        [TestMethod]
+        public async Task GetGroups()
+        {
+            Dictionary<string, IGroup> groups = await groupQuery.GetGroupsAsync();
+            Assert.IsTrue(groups.Count > 0);
+        }
+
+        [TestMethod]
+        public async Task GetGroup()
+        {
+            IGroup group = await groupQuery.GetGroupAsync("living");
+            Assert.IsTrue(group != null && !string.IsNullOrEmpty(group.ID));
         }
 
     }

@@ -42,6 +42,8 @@
   <ItemGroup>
     <Compile Include="IBridgeCommand.cs" />
     <Compile Include="IBridgeQuery.cs" />
+    <Compile Include="IGroup.cs" />
+    <Compile Include="IGroupQuery.cs" />
     <Compile Include="IHueDotNetConfigurationReader.cs" />
     <Compile Include="ILight.cs" />
     <Compile Include="ILightColourSwitch.cs" />
