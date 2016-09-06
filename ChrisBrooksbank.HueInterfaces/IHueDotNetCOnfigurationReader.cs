@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 
 namespace ChrisBrooksbank.Hue.Interfaces
 {
@@ -7,6 +8,7 @@ namespace ChrisBrooksbank.Hue.Interfaces
         IPAddress BridgeAddress { get; }
         string UserName { get; }
         string ApplicationName { get; }
+        int LightCacheExpiryMinutes{ get; }
     }
 
 }

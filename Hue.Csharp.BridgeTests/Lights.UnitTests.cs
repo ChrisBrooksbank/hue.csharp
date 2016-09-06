@@ -102,17 +102,31 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         }
 
         [TestMethod]
-        public async Task GetGroups()
+        public async Task GetGroupsAsync()
         {
             Dictionary<string, IGroup> groups = await groupQuery.GetGroupsAsync();
             Assert.IsTrue(groups.Count > 0);
         }
 
         [TestMethod]
-        public async Task GetGroup()
+        public async Task GetGroupAsync()
         {
             IGroup group = await groupQuery.GetGroupAsync("living");
             Assert.IsTrue(group != null && !string.IsNullOrEmpty(group.ID));
+        }
+
+        [TestMethod]
+        public async Task GetLightIDAsync()
+        {
+            string lightID = await lightQuery.GetLightIDAsync("landing");
+            Assert.IsTrue(lightID.Equals("8"));
+        }
+
+        [TestMethod]
+        public async Task GetLightIDAsyncAgain()
+        {
+            string lightID = await lightQuery.GetLightIDAsync("landing");
+            Assert.IsTrue(lightID.Equals("8"));
         }
 
     }

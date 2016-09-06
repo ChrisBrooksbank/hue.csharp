@@ -17,6 +17,8 @@ namespace ChrisBrooksbank.Hue.Implementation
             public string BridgeAddress { get; set; }
             public string UserName { get; set; }
             public string ApplicationName { get; set; }
+            public string LightCacheKeyName { get; set; }
+            public int LightCacheExpiryMinutes { get; set; }
         }
 
         HueDontNetConfiguration config;
@@ -58,6 +60,14 @@ namespace ChrisBrooksbank.Hue.Implementation
             get
             {
                 return config.ApplicationName;
+            }
+        }
+
+        public int LightCacheExpiryMinutes
+        {
+            get
+            {
+                return config.LightCacheExpiryMinutes;
             }
         }
     }
