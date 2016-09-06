@@ -8,6 +8,7 @@ namespace ChrisBrooksbank.Hue.Interfaces
 {
     public interface IGroupQuery
     {
+        Task<string> GetGroupIDAsync(string groupName);
         Task<IGroup> GetGroupAsync(string lightName);
         Task<Dictionary<string, IGroup>> GetGroupsAsync();
     }

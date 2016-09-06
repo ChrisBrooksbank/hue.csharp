@@ -111,7 +111,7 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         [TestMethod]
         public async Task GetGroupAsync()
         {
-            IGroup group = await groupQuery.GetGroupAsync("living");
+            IGroup group = await groupQuery.GetGroupAsync("Living");
             Assert.IsTrue(group != null && !string.IsNullOrEmpty(group.ID));
         }
 
@@ -129,6 +129,20 @@ namespace ChrisBrooksbank.Hue.BridgeTests
             Assert.IsTrue(lightID.Equals("8"));
         }
 
+
+        [TestMethod]
+        public async Task GetGroupIDAsync()
+        {
+            string groupID = await groupQuery.GetGroupIDAsync("Living");
+            Assert.IsTrue(groupID.Equals("1"));
+        }
+
+        [TestMethod]
+        public async Task GetGroupIDAsyncAgain()
+        {
+            string groupID = await groupQuery.GetGroupIDAsync("Living");
+            Assert.IsTrue(groupID.Equals("1"));
+        }
     }
    
 }
