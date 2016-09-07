@@ -6,15 +6,21 @@ using System.Threading.Tasks;
 
 namespace ChrisBrooksbank.Hue.Interfaces
 {
-    public interface ILightColour
+    public interface ILightNamedColour
     {
-
+        string Colour { get; set; }
+        string RGB { get; set; }
+        string GamutA { get; set; }
+        string GamutB { get; set; }
+        string GamutC { get; set; }
     }
 
     public interface ILightColourSwitch
     {
-        void SetColourAll(ILightColour colour, UInt16 transitionTimeIn100MS = 1);
-        void SetColourGroup(ILightColour colour, UInt16 transitionTimeIn100MS = 1);
-        void SetColourLight(ILightColour colour, UInt16 transitionTimeIn100MS = 1);
+        IEnumerable<ILightNamedColour> GetNamedColours();
+
+        Task SetColourAllAsync(string namedColour, UInt16 transitionTimeIn100MS = 1);
+        Task SetColourGroupAsync(string namedColour, UInt16 transitionTimeIn100MS = 1);
+        Task SetColourLightAsync(string namedColour, UInt16 transitionTimeIn100MS = 1);
     }
 }

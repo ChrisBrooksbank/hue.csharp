@@ -19,6 +19,7 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         ILightQuery lightQuery;
 
         ILightSwitch lightSwitch;
+        ILightColourSwitch lightColourSwitch;
 
         IGroupQuery groupQuery;
 
@@ -31,6 +32,7 @@ namespace ChrisBrooksbank.Hue.BridgeTests
 
             lightQuery = new Implementation.LightQuery(hueDotNetconfigurationReader);
             lightSwitch = new Implementation.LightSwitch(hueDotNetconfigurationReader, lightQuery);
+            lightColourSwitch = new Implementation.LightColourSwitch(hueDotNetconfigurationReader, lightQuery);
 
             groupQuery = new Implementation.GroupQuery(hueDotNetconfigurationReader);
         }
@@ -142,6 +144,23 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         {
             string groupID = await groupQuery.GetGroupIDAsync("Living");
             Assert.IsTrue(groupID.Equals("1"));
+        }
+
+        [TestMethod]
+        public void AzureIsANamedColour()
+        {
+            IEnumerable<ILightNamedColour> namedColours = lightColourSwitch.GetNamedColours();
+
+            bool foundAzure = false;
+            foreach(ILightNamedColour namedColour in namedColours)
+            {
+                if (namedColour.Colour.Equals("Azure"))
+                {
+                    foundAzure = true;
+                }
+            }
+
+            Assert.IsTrue(foundAzure);
         }
     }
    
