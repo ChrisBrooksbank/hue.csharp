@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ChrisBrooksbank.Hue.Implementation
 {
-    public class LightNamedColour : ILightNamedColour
+    public class NamedColourDetail : INamedColourDetail
     {
         public string Colour { get; set; }
         public string RGB { get; set; }
@@ -29,35 +29,20 @@ namespace ChrisBrooksbank.Hue.Implementation
             LightQuery = lightQuery;
         }
 
-        public IEnumerable<ILightNamedColour> GetNamedColours()
-        {
-            string namedColourFileName = "NamedColours.json";
-
-            if ( !File.Exists(namedColourFileName))
-            {
-                throw new ApplicationException("missing named colours file " + namedColourFileName );
-            }
-
-            string namedColoursJSON = File.ReadAllText(namedColourFileName);
-
-            List<LightNamedColour> namedColours = JsonConvert.DeserializeObject<List<LightNamedColour>>(namedColoursJSON);
-
-            return namedColours;
-        }
+      
 
 
-
-        public async Task SetColourAllAsync(string namedColour, ushort transitionTimeIn100MS = 1)
+        public async Task SetColourAllAsync(NamedColour namedColour, ushort transitionTimeIn100MS = 1)
         {
             throw new NotImplementedException();
         }
 
-        public async Task SetColourGroupAsync(string namedColour, ushort transitionTimeIn100MS = 1)
+        public async Task SetColourGroupAsync(NamedColour namedColour, ushort transitionTimeIn100MS = 1)
         {
             throw new NotImplementedException();
         }
 
-        public async Task SetColourLightAsync(string namedColour, ushort transitionTimeIn100MS = 1)
+        public async Task SetColourLightAsync(NamedColour namedColour, ushort transitionTimeIn100MS = 1)
         {
             throw new NotImplementedException();
         }

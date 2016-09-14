@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ChrisBrooksbank.Hue.BridgeTests
@@ -19,6 +20,7 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         ILightQuery lightQuery;
 
         ILightSwitch lightSwitch;
+        IColourQuery colourQuery;
         ILightColourSwitch lightColourSwitch;
 
         IGroupQuery groupQuery;
@@ -32,6 +34,7 @@ namespace ChrisBrooksbank.Hue.BridgeTests
 
             lightQuery = new Implementation.LightQuery(hueDotNetconfigurationReader);
             lightSwitch = new Implementation.LightSwitch(hueDotNetconfigurationReader, lightQuery);
+            colourQuery = new Implementation.ColourQuery();
             lightColourSwitch = new Implementation.LightColourSwitch(hueDotNetconfigurationReader, lightQuery);
 
             groupQuery = new Implementation.GroupQuery(hueDotNetconfigurationReader);
@@ -48,13 +51,13 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         }
 
         [TestMethod]
-        public void CanReadHueDotNetConfigurationBridgeAddress()
+        public void ReadHueDotNetConfigurationBridgeAddress()
         {
             Assert.IsTrue(hueDotNetconfigurationReader != null && hueDotNetconfigurationReader.BridgeAddress != null);
         }
 
         [TestMethod]
-        public void CanReadHueDotNetConfigurationUserName()
+        public void ReadHueDotNetConfigurationUserName()
         {
             Assert.IsTrue(hueDotNetconfigurationReader != null && !string.IsNullOrEmpty(hueDotNetconfigurationReader.UserName));
         }
@@ -91,14 +94,14 @@ namespace ChrisBrooksbank.Hue.BridgeTests
 
 
         [TestMethod]
-        public async Task CanTurnLightOn()
+        public async Task TurnLightOn()
         {
             await lightSwitch.TurnOnLightAsync("landing");
         }
 
 
         [TestMethod]
-        public async Task CanTurnLightOff()
+        public async Task TurnLightOff()
         {
             await lightSwitch.TurnOffLightAsync("landing");
         }
@@ -149,10 +152,10 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         [TestMethod]
         public void AzureIsANamedColour()
         {
-            IEnumerable<ILightNamedColour> namedColours = lightColourSwitch.GetNamedColours();
+            IEnumerable<INamedColourDetail> namedColours = colourQuery.GetNamedColourDetails();
 
             bool foundAzure = false;
-            foreach(ILightNamedColour namedColour in namedColours)
+            foreach(INamedColourDetail namedColour in namedColours)
             {
                 if (namedColour.Colour.Equals("Azure"))
                 {
@@ -162,6 +165,56 @@ namespace ChrisBrooksbank.Hue.BridgeTests
 
             Assert.IsTrue(foundAzure);
         }
+
+        [TestMethod]
+        public void RedIsANamedColour()
+        {
+            IEnumerable<INamedColourDetail> namedColours = colourQuery.GetNamedColourDetails();
+
+            bool foundAzure = false;
+            foreach (INamedColourDetail namedColour in namedColours)
+            {
+                if (namedColour.Colour.Equals("Red"))
+                {
+                    foundAzure = true;
+                }
+            }
+
+            Assert.IsTrue(foundAzure);
+        }
+
+        [TestMethod]
+        public void GetNamedColoursAsCSV()
+        {
+            IEnumerable<INamedColourDetail> namedColours = colourQuery.GetNamedColourDetails();
+
+            StringBuilder namedColoursCSVBuilder = new StringBuilder();
+            foreach (INamedColourDetail namedColour in namedColours)
+            {
+                namedColoursCSVBuilder.Append(namedColour.Colour.Replace(" ", string.Empty));
+                namedColoursCSVBuilder.Append(",");
+            }
+
+            string namedColoursCSV = namedColoursCSVBuilder.ToString();
+
+            Assert.IsTrue(namedColoursCSV.Length > 100);
+        }
+
+        [TestMethod]
+        public async void ALlLightsRed()
+        {
+            await lightColourSwitch.SetColourAllAsync( NamedColour.Red );
+            // TODO check colour was set
+        }
+
+        [TestMethod]
+        public async void ALlLightsBlue()
+        {
+            await lightColourSwitch.SetColourAllAsync(NamedColour.Blue);
+            // TODO check colour was set
+        }
+
+
     }
    
 }
