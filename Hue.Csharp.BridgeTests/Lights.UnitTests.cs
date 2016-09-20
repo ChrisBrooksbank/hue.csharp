@@ -35,7 +35,7 @@ namespace ChrisBrooksbank.Hue.BridgeTests
             lightQuery = new Implementation.LightQuery(hueDotNetconfigurationReader);
             lightSwitch = new Implementation.LightSwitch(hueDotNetconfigurationReader, lightQuery);
             colourQuery = new Implementation.ColourQuery();
-            lightColourSwitch = new Implementation.LightColourSwitch(hueDotNetconfigurationReader, lightQuery);
+            lightColourSwitch = new Implementation.LightColourSwitch(hueDotNetconfigurationReader, lightQuery, colourQuery);
 
             groupQuery = new Implementation.GroupQuery(hueDotNetconfigurationReader);
         }
@@ -201,16 +201,16 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         }
 
         [TestMethod]
-        public async void ALlLightsRed()
+        public async Task AllLightsRed()
         {
             await lightColourSwitch.SetColourAllAsync( NamedColour.Red );
             // TODO check colour was set
         }
 
         [TestMethod]
-        public async void ALlLightsBlue()
+        public async Task AllLightsDarkSeaGreen()
         {
-            await lightColourSwitch.SetColourAllAsync(NamedColour.Blue);
+            await lightColourSwitch.SetColourAllAsync(NamedColour.DarkSeaGreen);
             // TODO check colour was set
         }
 

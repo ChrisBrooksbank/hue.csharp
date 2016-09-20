@@ -57,7 +57,7 @@ namespace ChrisBrooksbank.Hue.Implementation
         {
             NamedColour namedColour;
 
-            Enum.TryParse<NamedColour>(namedColourDetail.Colour, out namedColour);
+            Enum.TryParse<NamedColour>(namedColourDetail.Colour.Replace(" ",string.Empty), out namedColour);
             return namedColour;
         }
     }

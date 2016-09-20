@@ -38,18 +38,11 @@ namespace ChrisBrooksbank.Hue.Implementation
 
         public async Task TurnOffLightAsync(string lightName)
         {
-            ILight light = await LightQuery.GetLightAsync(lightName);
+            string lightID = await LightQuery.GetLightIDAsync(lightName);
 
-            if (light != null)
+            if (!string.IsNullOrEmpty(lightID))
             {
-                if (!light.State.On)
-                {
-                    return;
-                }
-
-                light.State.On = false;
-
-                Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/lights/" + light.ID + "/state");
+                Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/lights/" + lightID + "/state");
                 StringContent requestContent = new StringContent("{\"on\" : false}");
                 HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
 
@@ -85,18 +78,11 @@ namespace ChrisBrooksbank.Hue.Implementation
 
         public async Task TurnOnLightAsync(string lightName)
         {
-            ILight light = await LightQuery.GetLightAsync(lightName);
+            string lightID = await LightQuery.GetLightIDAsync(lightName);
 
-            if (light != null)
+            if (!string.IsNullOrEmpty(lightID))
             {
-                if (light.State.On)
-                {
-                    return;
-                }
-
-                light.State.On = true;
-
-                Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/lights/" + light.ID + "/state");
+                Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/lights/" + lightID + "/state");
                 StringContent requestContent = new StringContent("{\"on\" : true}");
                 HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
 
