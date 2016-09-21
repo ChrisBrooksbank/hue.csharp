@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace ChrisBrooksbank.Hue.Interfaces
 {
-    public interface ILightSwitch
+    public interface IColourLoopSwitch
     {
         Task TurnOnAllAsync();
-        Task TurnOnLightAsync(string lightName);
         Task TurnOffAllAsync();
-        Task TurnOffLightAsync(string lightName);
     }
 }

@@ -42,7 +42,9 @@
   <ItemGroup>
     <Compile Include="IBridgeCommand.cs" />
     <Compile Include="IBridgeQuery.cs" />
+    <Compile Include="IColourLoopSwitch.cs" />
     <Compile Include="IColourQuery.cs" />
+    <Compile Include="ILightFlashSwitch.cs" />
     <Compile Include="IGroup.cs" />
     <Compile Include="IGroupQuery.cs" />
     <Compile Include="IHueDotNetConfigurationReader.cs" />
@@ -50,10 +52,10 @@
     <Compile Include="ILightColourSwitch.cs" />
     <Compile Include="ILightDescription.cs" />
     <Compile Include="ILightDimmerSwitch.cs" />
-    <Compile Include="ILightEffectSwitch.cs" />
     <Compile Include="ILightQuery.cs" />
     <Compile Include="ILightState.cs" />
     <Compile Include="ILightSwitch.cs" />
+    <Compile Include="ILightColourLoopSwitch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

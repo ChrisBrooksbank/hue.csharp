@@ -22,6 +22,9 @@ namespace ChrisBrooksbank.Hue.BridgeTests
         ILightSwitch lightSwitch;
         IColourQuery colourQuery;
         ILightColourSwitch lightColourSwitch;
+        ILightDimmerSwitch lightDimmerSwitch;
+        ILightFlashSwitch lightFlashSwitch;
+        ILightColourLoopSwitch lightColourLoopSwitch;
 
         IGroupQuery groupQuery;
 
@@ -36,6 +39,9 @@ namespace ChrisBrooksbank.Hue.BridgeTests
             lightSwitch = new Implementation.LightSwitch(hueDotNetconfigurationReader, lightQuery);
             colourQuery = new Implementation.ColourQuery();
             lightColourSwitch = new Implementation.LightColourSwitch(hueDotNetconfigurationReader, lightQuery, colourQuery);
+            lightDimmerSwitch = new Implementation.LightDimmerSwitch(hueDotNetconfigurationReader, lightQuery);
+            lightFlashSwitch = new Implementation.LightFlashSwitch(hueDotNetconfigurationReader);
+            lightColourLoopSwitch = new Implementation.LightColourLoopSwitch(hueDotNetconfigurationReader);
 
             groupQuery = new Implementation.GroupQuery(hueDotNetconfigurationReader);
         }
@@ -228,6 +234,29 @@ namespace ChrisBrooksbank.Hue.BridgeTests
             // TODO check colour was set
         }
 
+        [TestMethod]
+        public async Task MaxBrightnessAllLights()
+        {
+            await lightDimmerSwitch.SetMaxBrightnessAllASync();
+        }
+
+        [TestMethod]
+        public async Task MinBrightnessAllLights()
+        {
+            await lightDimmerSwitch.SetMinBrightnessAllAsync();
+        }
+
+        [TestMethod]
+        public async Task FlashAllOnce()
+        {
+            await lightFlashSwitch.FlashAllOnceAsync();
+        }
+
+        [TestMethod]
+        public async Task FlashAllSeveralTimes()
+        {
+            await lightFlashSwitch.FlashAllSeveralTimesASync();
+        }
 
     }
    

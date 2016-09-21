@@ -70,15 +70,8 @@ namespace ChrisBrooksbank.Hue.Implementation
 
         }
 
-        public async Task SetColourGroupAsync(NamedColour namedColour, string groupName)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task SetColourLightAsync(NamedColour namedColour, string lightName)
         {
-            // TODO working on this now
-
             string lightID = await LightQuery.GetLightIDAsync(lightName);
 
             Dictionary<string, ILightDescription> lightDescriptions = await LightQuery.GetLightDescriptionsAsync();

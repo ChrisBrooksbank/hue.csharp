@@ -31,11 +31,6 @@ namespace ChrisBrooksbank.Hue.Implementation
             return;
         }
 
-        public async Task TurnOffGroupAsync(string groupName)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task TurnOffLightAsync(string lightName)
         {
             string lightID = await LightQuery.GetLightIDAsync(lightName);
@@ -69,11 +64,6 @@ namespace ChrisBrooksbank.Hue.Implementation
             }
 
             return;
-        }
-
-        public async Task TurnOnGroupAsync(string groupName)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task TurnOnLightAsync(string lightName)

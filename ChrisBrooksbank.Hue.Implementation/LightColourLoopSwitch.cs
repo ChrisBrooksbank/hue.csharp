@@ -1,26 +1,23 @@
-﻿using ChrisBrooksbank.Hue.Interfaces;
-using System;
-using System.Net.Http;
+﻿using System;
 using System.Threading.Tasks;
+using ChrisBrooksbank.Hue.Interfaces;
+using System.Net.Http;
 
 namespace ChrisBrooksbank.Hue.Implementation
 {
-    public class LightDimmerSwitch : ILightDimmerSwitch
+    public class LightColourLoopSwitch : ILightColourLoopSwitch
     {
-
         IHueDotNetConfigurationReader HueConfiguration;
-        ILightQuery LightQuery;
 
-        public LightDimmerSwitch(IHueDotNetConfigurationReader hueConfiguration, ILightQuery lightQuery)
+        public LightColourLoopSwitch(IHueDotNetConfigurationReader hueConfiguration)
         {
             HueConfiguration = hueConfiguration;
-            LightQuery = lightQuery;
         }
 
-        public async Task SetMaxBrightnessAllASync()
+        public async Task TurnOffAllASync()
         {
             Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/groups/0/action");
-            StringContent requestContent = new StringContent("{\"bri\" : 254}");
+            StringContent requestContent = new StringContent("{\"effect\" : \"none\"}");
 
             HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
             using (var client = new HttpClient())
@@ -31,10 +28,10 @@ namespace ChrisBrooksbank.Hue.Implementation
             return;
         }
 
-        public async Task SetMinBrightnessAllAsync()
+        public async Task TurnOnAllASync()
         {
             Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/groups/0/action");
-            StringContent requestContent = new StringContent("{\"bri\" : 1}");
+            StringContent requestContent = new StringContent("{\"effect\" : \"colorloop\"}");
 
             HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
             using (var client = new HttpClient())
