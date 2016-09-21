@@ -12,6 +12,7 @@ namespace ChrisBrooksbank.Hue.Interfaces
         Task<string> GetLightIDAsync(string lightName);
         Task<ILight> GetLightAsync(string lightName);
         Task<Dictionary<string, ILight>> GetLightsAsync();
+        Task<Dictionary<string, ILightDescription>> GetLightDescriptionsAsync();
     }
 
 }

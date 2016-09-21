@@ -214,6 +214,20 @@ namespace ChrisBrooksbank.Hue.BridgeTests
             // TODO check colour was set
         }
 
+        [TestMethod]
+        public async Task LightRed()
+        {
+            await lightColourSwitch.SetColourLightAsync(NamedColour.Red,"landing");
+            // TODO check colour was set
+        }
+
+        [TestMethod]
+        public async Task LightBrown()
+        {
+            await lightColourSwitch.SetColourLightAsync(NamedColour.Brown, "landing");
+            // TODO check colour was set
+        }
+
 
     }
    

@@ -43,10 +43,58 @@ namespace ChrisBrooksbank.Hue.Implementation
             return light;
         }
 
+        public async Task<Dictionary<string, ILightDescription>> GetLightDescriptionsAsync()
+        {
+            ObjectCache cache = MemoryCache.Default;
+            Dictionary<string, ILightDescription> lightDescriptionCache = cache["LightDescriptionCache"] as Dictionary<string, ILightDescription>;
+
+            if (lightDescriptionCache == null)
+            {
+                CacheItemPolicy policy = new CacheItemPolicy();
+                policy.AbsoluteExpiration = new DateTimeOffset(DateTime.UtcNow.AddMinutes(HueConfiguration.LightCacheExpiryMinutes));
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new System.Uri("http://" + HueConfiguration.BridgeAddress);
+                    HttpResponseMessage response = await client.GetAsync("/api/" + HueConfiguration.UserName + "/lights");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseString = await response.Content.ReadAsStringAsync();
+
+                        Dictionary<string, Light> jsonLights = new Dictionary<string, Light>();
+                        jsonLights = JsonConvert.DeserializeObject<Dictionary<string, Light>>(responseString);
+
+                        lightDescriptionCache = new Dictionary<string, ILightDescription>();
+
+                        foreach (var light in jsonLights)
+                        {
+                            ILightDescription lightDescription = new LightDescription
+                            {
+                                ModelID = light.Value.ModelID,
+                                ManufacturerName = light.Value.ManufacturerName,
+                                Name = light.Value.Name,
+                                Type = light.Value.Type,
+                                SWVersion = light.Value.SWVersion,
+                                Uniqueid = light.Value.Uniqueid
+                            };
+
+                            lightDescriptionCache[light.Value.Name] = lightDescription;
+                        }
+
+                        cache.Set("LightDescriptionCache", lightDescriptionCache, policy);
+                    }
+
+                }
+            }
+
+            return lightDescriptionCache;
+        }
+
         public async Task<string> GetLightIDAsync(string lightName)
         {
             ObjectCache cache = MemoryCache.Default;
-            Dictionary<string, string> lightCache = cache["LightCache"] as Dictionary<string, string>;
+            Dictionary<string, string> lightCache = cache["LightIDCache"] as Dictionary<string, string>;
 
             if (lightCache == null)
             {
@@ -72,7 +120,7 @@ namespace ChrisBrooksbank.Hue.Implementation
                             lightCache[light.Value.Name] = light.Key;
                         }
 
-                        cache.Set("LightCache", lightCache, policy);
+                        cache.Set("LightIDCache", lightCache, policy);
                     }
 
                 }

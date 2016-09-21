@@ -54,6 +54,7 @@
     <Compile Include="HueDotNetConfigurationReader.cs" />
     <Compile Include="Light.cs" />
     <Compile Include="LightColourSwitch.cs" />
+    <Compile Include="LightDescription.cs" />
     <Compile Include="LightDimmerSwitch.cs" />
     <Compile Include="LightEffectSwitch.cs" />
     <Compile Include="LightQuery.cs" />

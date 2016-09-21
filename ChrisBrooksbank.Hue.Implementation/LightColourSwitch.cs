@@ -33,11 +33,10 @@ namespace ChrisBrooksbank.Hue.Implementation
 
         public async Task SetColourAllAsync(NamedColour namedColour)
         {
-            Dictionary<string,ILight> lights = await LightQuery.GetLightsAsync();
-            foreach(var lightAndName in lights)
+            Dictionary<string, ILightDescription> lightDescriptions = await LightQuery.GetLightDescriptionsAsync();
+            foreach(var lightDescriptionAndID in lightDescriptions)
             {
-                ILight light = lightAndName.Value;
-                Gamut gamut = GetGamut(light);
+                Gamut gamut = GetGamut(lightDescriptionAndID.Value);
                 INamedColourDetail namedColourDetail = ColourQuery.GetNamedColourDetail(namedColour);
 
                 string xyString = string.Empty;
@@ -54,7 +53,58 @@ namespace ChrisBrooksbank.Hue.Implementation
                         break;
                 }
 
-                Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/lights/" + light.ID + "/state");
+                if (!string.IsNullOrEmpty(xyString))
+                {
+                    string lightID = await LightQuery.GetLightIDAsync(lightDescriptionAndID.Value.Name);
+                    Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/lights/" + lightID + "/state");
+                    StringContent requestContent = new StringContent("{\"xy\" : " + xyString + "}");
+                    HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
+
+                    using (var client = new HttpClient())
+                    {
+                        HttpResponseMessage response = await client.SendAsync(request);
+                    }
+                }
+
+            }
+
+        }
+
+        public async Task SetColourGroupAsync(NamedColour namedColour, string groupName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task SetColourLightAsync(NamedColour namedColour, string lightName)
+        {
+            // TODO working on this now
+
+            string lightID = await LightQuery.GetLightIDAsync(lightName);
+
+            Dictionary<string, ILightDescription> lightDescriptions = await LightQuery.GetLightDescriptionsAsync();
+            ILightDescription lightDescription = lightDescriptions[lightName];
+
+            Gamut gamut = GetGamut(lightDescription);
+            INamedColourDetail namedColourDetail = ColourQuery.GetNamedColourDetail(namedColour);
+
+            string xyString = string.Empty;
+
+            switch (gamut)
+            {
+                case Gamut.A:
+                    xyString = namedColourDetail.GamutA;
+                    break;
+                case Gamut.B:
+                    xyString = namedColourDetail.GamutB;
+                    break;
+                case Gamut.C:
+                    xyString = namedColourDetail.GamutC;
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(xyString))
+            {
+                Uri RequestUri = new Uri("http://" + HueConfiguration.BridgeAddress + "/api/" + HueConfiguration.UserName + "/lights/" + lightID + "/state");
                 StringContent requestContent = new StringContent("{\"xy\" : " + xyString + "}");
                 HttpRequestMessage request = new HttpRequestMessage { Method = HttpMethod.Put, RequestUri = RequestUri, Content = requestContent };
 
@@ -62,26 +112,15 @@ namespace ChrisBrooksbank.Hue.Implementation
                 {
                     HttpResponseMessage response = await client.SendAsync(request);
                 }
-
             }
 
         }
 
-        public async Task SetColourGroupAsync(NamedColour namedColour)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task SetColourLightAsync(NamedColour namedColour)
-        {
-            throw new NotImplementedException();
-        }
-
-        private Gamut GetGamut( ILight light )
+        private Gamut GetGamut(ILightDescription lightDescription )
         {
             Gamut gamut = Gamut.none;
 
-            switch (light.ModelID)
+            switch (lightDescription.ModelID)
             {
                 case "LST001":
                 case "LLC010":

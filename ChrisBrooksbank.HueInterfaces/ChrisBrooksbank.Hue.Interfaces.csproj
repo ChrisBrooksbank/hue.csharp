@@ -48,6 +48,7 @@
     <Compile Include="IHueDotNetConfigurationReader.cs" />
     <Compile Include="ILight.cs" />
     <Compile Include="ILightColourSwitch.cs" />
+    <Compile Include="ILightDescription.cs" />
     <Compile Include="ILightDimmerSwitch.cs" />
     <Compile Include="ILightEffectSwitch.cs" />
     <Compile Include="ILightQuery.cs" />
